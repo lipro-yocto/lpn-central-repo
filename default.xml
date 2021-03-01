@@ -5,10 +5,12 @@
 
   <remote fetch="https://git.yoctoproject.org/git" name="yocto"/>
   <remote fetch="https://github.com/openembedded" name="oe"/>
+  <remote fetch="https://github.com/meta-qt5" name="qt5"/>
   <remote fetch="https://github.com/lipro-yocto" name="lpy"/>
 
   <project remote="yocto" name="poky" path="sources/poky"/>
   <project remote="oe" name="meta-openembedded" path="sources/openembedded"/>
+  <project remote="qt5" name="meta-qt5" path="sources/qt/meta-qt5" />
 
   <project remote="lpy" name="lpn-central" path="sources/central">
 	<copyfile dest="setup-environment" src="scripts/setup-environment"/>
