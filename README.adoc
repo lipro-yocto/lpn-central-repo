@@ -1,0 +1,268 @@
+= Li-Pro.Net Central repo manifest
+Stephan Linz <linz@li-pro.net>
+:revnumber: 0.1
+:revdate: 2021/03/02
+:revremark: The overall common incarnation of {doctitle}
+:version-label!:
+:sectnums:
+:toc:
+:toc-placement!:
+:ext-relative: {outfilesuffix}
+
+This is the Git repo manifest for Li-Pro.Net Central embedded environment.
+
+toc::[]
+
+== Quick Start
+
+To get the Li-Pro.Net build environment you need to have `repo` installed
+and use it as:
+
+Install the `repo` utility:
+
+[source,console]
+$: mkdir -p ~/.local/bin
+$: curl https://raw.githubusercontent.com/lipro-yocto/git-repo/lpn-launcher/repo > ~/.local/bin/repo
+$: chmod a+x ~/.local/bin/repo
+$: sha1sum ~/.local/bin/repo
+
+For *repo launcher version 2.12.2.2021.2.20*, the SHA-1 checksum
+for `repo` is *93cab6406f072e78874dac1d891427c84189f0b6*
+
+For *repo launcher version 2.8.2020.10.4*, the SHA-1 checksum
+for `repo` is *1c5afd4164e7b9dd7939334291ededc54ef280f2*
+
+=== Default Manifest
+
+Download default build environment:
+
+[source,console]
+$: PATH=${PATH}:~/.local/bin
+$: mkdir lpn-central-workspace
+$: cd lpn-central-workspace
+$: repo init -u https://github.com/lipro-yocto/lpn-central-repo \
+             -b master -m default.xml
+$: repo sync
+
+At the end of the commands you have every metadata you need to start work with.
+
+=== Build Stage
+
+To start a simple image build:
+
+[source,console]
+$: source ./setup-environment
+$: bitbake core-image-minimal
+
+You can use any directory to host your build.
+
+The source code is checked out at `lpn-central-workspace/sources`.
+
+==== Yocto Core Images
+
+To see available images, run inside the checked out source path
+`lpn-central-workspace/sources`:
+
+[source,console]
+$: find . -name core-image*.bb | sort -ub
+./poky/meta/recipes-core/images/core-image-base.bb
+./poky/meta/recipes-core/images/core-image-minimal.bb
+./poky/meta/recipes-core/images/core-image-minimal-dev.bb
+./poky/meta/recipes-core/images/core-image-minimal-initramfs.bb
+./poky/meta/recipes-core/images/core-image-minimal-mtdutils.bb
+./poky/meta/recipes-core/images/core-image-tiny-initramfs.bb
+./poky/meta/recipes-extended/images/core-image-full-cmdline.bb
+./poky/meta/recipes-extended/images/core-image-kernel-dev.bb
+./poky/meta/recipes-extended/images/core-image-testmaster.bb
+./poky/meta/recipes-extended/images/core-image-testmaster-initramfs.bb
+./poky/meta/recipes-graphics/images/core-image-clutter.bb
+./poky/meta/recipes-graphics/images/core-image-weston.bb
+./poky/meta/recipes-graphics/images/core-image-x11.bb
+./poky/meta/recipes-rt/images/core-image-rt.bb
+./poky/meta/recipes-rt/images/core-image-rt-sdk.bb
+./poky/meta/recipes-sato/images/core-image-sato.bb
+./poky/meta/recipes-sato/images/core-image-sato-dev.bb
+./poky/meta/recipes-sato/images/core-image-sato-ptest-fast.bb
+./poky/meta/recipes-sato/images/core-image-sato-sdk.bb
+./poky/meta/recipes-sato/images/core-image-sato-sdk-ptest.bb
+./openembedded/meta-xfce/recipes-core/images/core-image-minimal-xfce.bb
+./meta-mingw/recipes-core/images/core-image-mingw-sdktest.bb
+
+Those are all available images. And note that, available core images from
+*poky* and *meta-openembedded* only. As you may imagine, several other layers
+can be included, and any new layer can provide new images.
+
+[quote, Daiane Angolini, https://community.freescale.com/docs/DOC-95421]
+____
+Yocto Project provides some "pre baked" images. In my point of view, those
+images are not to be used on your product. They are examples and quick
+starting points.
+
+An handy example: When you desire a pie, you can go to supermarket and buy
+a frozen chocolate pie. But when you're developing a pie to be the Apple
+Salted Caramel with Dark Chocolate Cinnamon Topping you need to decide every
+piece of this pie. What is the base, which type of apple to use. How much
+salt on caramel. This is your product, your pie, not a frozen standard pie.
+
+I know the analogy is kind of dumb. But it's important to understand that the
+"pre baked" images provided by Yocto Project are not supposed to become a
+product image! You can (and maybe should) base your image on some of those
+images, but they are not good enough to your product.
+
+I highly recommend you to have your own image file.
+____
+
+.Core Images Overview
+[cols="1s,3a,3a",frame="topbot",options="header"]
+|===
+|Image Name|Formal Description|Use it when/for
+3+|core-image-minimal|
+  |A small image just capable of allowing a device to boot.
+  |* testing machine support
+   * boot loader support/upgrade
+   * kernel support/upgrade
+3+|core-image-minimal-initramfs|
+2+|Small image capable of booting a device. The kernel includes the Minimal
+   RAM-based Initial Root Filesystem (initramfs), which finds the first 'init'
+   program more efficiently.
+3+|core-image-minimal-mtdutils|
+2+|Small image capable of booting a device with support for the Minimal MTD
+   Utilities, which let the user interact with the MTD subsystem in the kernel
+   to perform operations on flash devices.
+3+|core-image-base|
+  |A console-only image that fully supports the target device hardware.
+  |* need to add something like ssh/dropbear or evtest or usb utils
+   * always configure this on `local.conf` to add the desired package
+3+|core-image-full-cmdline|
+2+|A console-only image with more full-featured Linux system functionality
+   installed.
+3+|core-image-lsb|
+2+|An image containing packages that are required to conform to the Linux
+   Standard Base (LSB) specification.
+3+|core-image-rt|
+  |A small image just capable of allowing a device to boot plus a real-time
+   test suite and tools appropriate for real-time use.
+  |* testing real-time support
+3+|core-image-weston|
+  |A very basic Wayland image with a terminal.
+  |* debug Wayland GPU support
+3+|core-image-x11|
+  |A very basic X11 image with a terminal
+  |* need to test X11 accelerated by GPU
+   * need to have X11 for any test
+3+|core-image-clutter|
+2+|An image with support for the Open GL-based toolkit Clutter, which enables
+   development of rich and animated graphical user interfaces.
+3+|core-image-sato|
+2+|Image with Sato, a mobile environment and visual style for mobile devices.
+   The image supports X11 with a Sato theme, Pimlico applications, and contains
+   terminal, editor, and file manager.
+3+|core-image-minimal-xfce|
+2+|A XFCE minimal demo image.
+3+|core-image-mingw-sdktest|
+2+|A specific image that can be used to build MinGW SDKs. This image includes
+   extra recipes that are know to build for MinGW so that they can be tested
+   on the autobuilder.
+|===
+
+All those images *DO NOT* include `-dev` packages or native build. If you want
+it you *MUST* configure your `local.conf`. Although, you can find special images
+that provides the header files or the native compiler.
+
+The images with *-dev* sufix include the header files (and development files)
+from all packages. For example: *core-image-minimal-dev* (A small image just
+capable of allowing a device to boot and is suitable for development work.)
+
+The images with *-sdk* sufix include the native build tools. For example
+*core-image-sato-sdk* (Image with Sato support that includes everything within
+*core-image-sato* plus *meta-toolchain*, development headers and libraries to
+form a standalone SDK.)
+
+Read more on https://community.freescale.com/docs/DOC-94849[Yocto Training]
+provided by the Freescale community, Daiane Angolini.
+
+==== Yocto Toolchain Support
+
+To see available toolchains, run inside the checked out source path
+`lpn-central-workspace/sources`:
+
+[source,console]
+$: find . -name meta-toolchain*.bb | sort -u
+./poky/meta/recipes-core/meta/meta-toolchain.bb
+./meta-qt5/recipes-qt/meta/meta-toolchain-qt5.bb
+
+Those are all available toolchains. And note that, available toolchains from
+*poky*, *meta-openembedded* and *meta-qt5* only. As you may imagine, several
+other layers can be included, and any new layer can provide new toolchains.
+
+.Toolchains Overview
+[cols="1s,3a,3a",frame="topbot",options="header"]
+|===
+|Meta Name|Formal Description|Use it when/for
+3+|meta-toolchain|
+  |Meta package for building a installable toolchain.
+  |* to have the crosscompiler installed on the developer machine
+   * to manually build boot loader and kernel
+3+|meta-toolchain-qt5|
+2+|Meta package for building a installable Qt5 toolchain and SDK.
+|===
+
+To build a cross toolchain for the current build machine:
+
+[source,console]
+$: bitbake meta-toolchain
+
+To build a cross toolchain for a Windows 32 bit machine:
+
+[source,console]
+$: SDKMACHINE=i686-mingw32
+$: bitbake meta-toolchain
+
+To build a cross toolchain for a Windows 64 bit machine:
+
+[source,console]
+$: SDKMACHINE=x86_64-mingw32
+$: bitbake meta-toolchain
+
+== Contributing
+
+To contribute to the manifest you should send a pull request to this GitHub
+project or send the patches for review to the authors mailing address.
+
+Issue tracker::
+    https://github.com/lipro-yocto/lpn-central/issues
+
+Pull requests::
+    https://github.com/lipro-yocto/lpn-central/pulls
+
+Source code::
+    https://github.com/lipro-yocto/lpn-central
+
+When creating patches, please use something like:
+
+[source,console]
+$: git format-patch -s --subject-prefix='lpn-central][PATCH' origin
+
+When sending patches, please use something like:
+
+[source,console]
+$: git send-email --to rexut@users.noreply.github.com <generated patch>
+
+== Using Development and Testing Branches
+
+Replace the `repo init` command above with one of the following:
+
+master:: For developers
++
+[source,console]
+$: repo init -u https://github.com/lipro-yocto/lpn-central -b master
+
+master-next:: For intrepid developers and testers
++
+Patches are typically merged into master-next and then are merged into master
+after a testing and comment period. It's possible that master-next has
+something you want or need. But it's also possible that using master-next
+breaks something that was working before. Use with caution.
+
+[source,console]
+$: repo init -u https://github.com/lipro-yocto/lpn-central -b master-next
